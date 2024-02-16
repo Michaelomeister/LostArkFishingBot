@@ -4,7 +4,7 @@ import cv2
 import time
 from time import gmtime, strftime
 import random
-import win32gui
+# import win32gui
 import yaml
 
 # screen resolution
@@ -16,7 +16,7 @@ with open("resources/keybindings.yaml", "r") as yamlfile:
 
 # Variables
 flag = "pulled"
-counter = 1
+counter = 0
 idletimer = 0
 
 # Function to cast fishing rod ingame
@@ -49,8 +49,8 @@ def repairFishingRod(screenWidth, screenHeight):
 
     # Small repair button offset
     print(strftime("%H:%M:%S", gmtime()), "Clicking on Pet Function: remote repair.")
-    xOffset = 0.674
-    yOffset = 0.641
+    xOffset = 0.610
+    yOffset = 0.639
     moveToX1 = round(screenWidth * xOffset)
     moveToY1 = round(screenHeight * yOffset)
     pyautogui.click(x=moveToX1, y=moveToY1, clicks=0, button='left')
@@ -63,7 +63,7 @@ def repairFishingRod(screenWidth, screenHeight):
     # Repair All offset
     print(strftime("%H:%M:%S", gmtime()), "Clicking on Repair All button.")
     xOffset = 0.384
-    yOffset = 0.688
+    yOffset = 0.730
     moveToX2 = round(screenWidth * xOffset)
     moveToY2 = round(screenHeight * yOffset)
     pyautogui.click(x=moveToX2, y=moveToY2, clicks=0, button='left')
@@ -75,7 +75,7 @@ def repairFishingRod(screenWidth, screenHeight):
 
     # Repair OK offset
     print(strftime("%H:%M:%S", gmtime()), "Clicking on OK button.")
-    xOffset = 0.457
+    xOffset = 0.467
     yOffset = 0.578
     moveToX3 = round(screenWidth * xOffset)
     moveToY3 = round(screenHeight * yOffset)
@@ -108,12 +108,14 @@ print(strftime("%H:%M:%S", gmtime()), "Starting the bot in 5 seconds. Automatic 
 time.sleep(5)
 
 while(1):
+    if counter == 0:
+        repairFishingRod(screenWidth, screenHeight)
     idletimer = idletimer + 1
     if flag == "pulled":
         castFishingRod(counter)
         flag = "thrown"
         counter = counter + 1
-        
+
     # screenshot creation
     image = pyautogui.screenshot(region=(screenWidth/2 - 100, screenHeight/2 - 150, 200, 200))
     image = cv2.cvtColor(numpy.array(image), 0)
@@ -127,7 +129,7 @@ while(1):
     if len(loc[0]) > 0 and flag == "thrown":
         print(strftime("%H:%M:%S", gmtime()), "Found a fish.")
         idletimer = 0
-        time.sleep(random.uniform(0.25, 1.0))
+        time.sleep(random.uniform(0.15, 0.50))
 
         # Caught fish, press e ingame to reel it in
         pyautogui.keyDown(keybindings['fishing'])
@@ -146,7 +148,7 @@ while(1):
     # search pattern on screen for buoy
     poplavok_coordinates = cv2.matchTemplate(image, poplavok, cv2.TM_CCOEFF_NORMED)
     poplavok_loc = numpy.where( poplavok_coordinates >= 0.7)
-    
+
     if len(poplavok_loc[0]) == 0 and flag == "pulled":
         castFishingRod(counter)
         flag = "thrown"
